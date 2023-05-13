@@ -5,3 +5,5 @@ def F(t, Y, mA, G, xA, yA):
     ddxB = G * mA * (xA - xB) / r**3
     ddyB = G * mA * (yA - yB) / r**3
     return [dxB, dyB, ddxB, ddyB]
+
+def solution():
