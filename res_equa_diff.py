@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+import matplotlib.cm as cm
 from math import sqrt
 
 
@@ -44,61 +46,48 @@ def meth_n_step(y0, t0, N, h, f, meth):
     for i in range(1, N):
         t[i]=t0+i*h
         y[i]=meth(y[i-1], t[i-1], h, f)
-    return t,y
+    return np.array(t), np.array(y)
 
+def norm(y, z):
+    L=[0 for i in range(len(y))]
+    for i in range(len(y)):
+        for j in range(len(z)):
+            if(i==2*j):
+                L[i]=L[i]-L[j]
+    return np.linalg.norm(L)
 
 ##Cette fonction calcule une solution approché avec un paramètre d'erreur epsilon
 def meth_epsilon(y0, t0, tf, eps, f, meth):
-    N=100
+    N=1000
     h=(tf-t0)/N
-    y=y0
-    t=t0
-    while t<tf:
-        h=min(h, tf-t)/N
-        y_N=meth_n_step(y, t, 1, h, f, meth)
-        y_2N=meth_n_step(y, t, 2, h/2, f, meth)
-        erreur=abs(norme_infinie(y-N)-norme_infinie(y_2N))
-        if erreur<= eps:
-            y=y_N
-            t+=h
-        h=h*(eps/erreur)
-    return y
+    y_N=meth_n_step(y0, t0, N, h, f, meth)[1]
+    y_2N=meth_n_step(y0, t0, 2*N, h/2, f, meth)[1]
+    error = np.abs(norm(y_N, y_2N))
+    while(error > eps):
+            print(N)
+            N=N*2
+            h=(tf-t0)/N
+            y_N=y_2N
+            y_2N=meth_n_step(y0, t0, 2*N, h/2, f, meth)
+            error = np.abs(norm(y_N, y_2N))
+    return y_N
+
+
 
 ##Cette fonction permet de dessiner le champ des tangentes de l'équation différentielle (on utilise quiver)
 
-def plot_tang_equ_diff(f, t, y, res, meth):
-    X, Y = np.meshgrid(np.linspace(t[0], t[1], res), np.linspace(y[0], y[1], res))
-    U = np.zeros_like(X)
-    V = np.zeros_like(Y)
-    for i in range(res):
-        for j in range(res):
-            y = np.array([X[i,j], Y[i,j]])
-            u, v = meth(y, 0, 0.1, f)
-            U[i,j] = u
-            V[i,j] = v
-    plt.quiver(X, Y, U, V)
-    plt.xlabel("x")
-    plt.ylabel("y")
+
+def plot_champ_tang_equ_diff(f, t0, tf, y0, yf, N):
+    X, Y, U, V = [1 for i in range(0, N**2)], [1 for i in range(0, N**2)], [1 for i in range(0, N**2)], [1 for i in range(0, N**2)]
+    hx, hy = (tf - t0)/N, (yf - y0)/N
+    for i in range(0, N):
+        for j in range(0, N):
+            X[N*i + j] = t0 + i*hx
+            Y[N*i + j] = y0 + j*hy
+            V[N*i + j] = f(t0 + i*hx, y0 + j*hy)
+    colors = np.arctan2(U, V)
+    norm = Normalize()
+    norm.autoscale(colors)
+    colormap = cm.viridis
+    plt.quiver(X, Y, U, V, color=colormap(norm(colors)))
     plt.show()
-
-##les fonction de test de dimension 1 et 2##
-
-def test_func_dim1():
-    return 0
-
-def test_func_dim2():
-    return 0
-
-
-def f(y, t):
-    return -y
-
-sol=meth_n_step(1, 0, 10, 0.1, f, step_euler)
-print(sol)
-
-def f(y, t):
-    return np.array([-y[0], -y[1]])
-
-t = [-5, 5]
-y = [-5, 5]
-res = 20
