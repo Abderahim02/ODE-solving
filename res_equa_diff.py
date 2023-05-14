@@ -58,7 +58,7 @@ def norm(y, z):
 
 ##Cette fonction calcule une solution approché avec un paramètre d'erreur epsilon
 def meth_epsilon(y0, t0, tf, eps, f, meth):
-    N=100
+    N=1000
     h=(tf-t0)/N
     y_N=meth_n_step(y0, t0, N, h, f, meth)[1]
     y_2N=meth_n_step(y0, t0, 2*N, h/2, f, meth)[1]
