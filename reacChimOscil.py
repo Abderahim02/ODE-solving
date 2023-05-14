@@ -9,8 +9,8 @@ a, c, d = 10, 200, 50
 # Définition du système d'équations différentielles
 def system(y, t, b):
     dydt = np.zeros((3,))
-    dydt[0] = a + b*y[2] - y[0] - y[0]*y[1]**2
-    dydt[1] = c*(y[0] + y[0]*y[1]**2 - y[1])
+    dydt[0] = a + b*y[2] - y[0] - y[0]*(y[1]**2)
+    dydt[1] = c*(y[0] + y[0]*(y[1]**2) - y[1])
     dydt[2] = d*(y[1] - y[2])
     return dydt
 
@@ -21,16 +21,36 @@ y0 = [1, 0, 0]
 n = 1001
 
 # Max de t
-tmax = 10
+tmax = .5
 
 # Temps
 t = np.linspace(0, tmax, n)
 
 # Nb de valeurs de B
-bmax = 5
+bmax = 10000
 
 # Variable
-B = np.linspace(.1, .2, bmax)
+B = np.linspace(.14, .16, bmax)
+
+def determinePeriod(b):
+    sol = odeint(system, y0, t, args=(b,))
+    y = sol[:, 1]
+    max_y = []
+    for i in range(1, len(y) - 1):
+        if t[i] > .2 and y[i] > y[i - 1] and y[i] > y[i + 1]: # y[i] is a local max
+            if  len(max_y) > 0 and abs(y[i] - max_y[0]) < 1: # y[i] is close to the first local max
+                return max_y
+            max_y.append(int(y[i]))
+    return max_y
+
+x, y = [], []
+for b in B:
+    m = determinePeriod(b)
+    for i in range(len(m)):
+        x.append(b)
+        y.append(m[i])
+plt.scatter(x, y, s=1)
+plt.show()
 
 # fig, axs = plt.subplots(len(B), 3)
 
@@ -74,22 +94,21 @@ B = np.linspace(.1, .2, bmax)
 
 # plt.show()
 
-fig, axs = plt.subplots(len(B))
+# fig, axs = plt.subplots(len(B))
 
-# Boucle sur les valeurs de B
-for i in range(len(B)):
-    b = B[i]
+# # Boucle sur les valeurs de B
+# for i in range(len(B)):
+#     b = B[i]
 
-    # Résolution du système d'équations différentielles
-    sol = odeint(system, y0, t, args=(b,))
+#     # Résolution du système d'équations différentielles
+#     sol = odeint(system, y0, t, args=(b,))
 
-    # Graphique
-    axs[i].plot(t, sol[:, 1], 'g')
+#     # Graphique
+#     axs[i].plot(t, sol[:, 1], 'g')
 
 # axs[2][1].set(xlabel='y(t)')
 # axs[0][0].set(ylabel='b = ' + '.125')
 # axs[1][0].set(ylabel='b = ' + '.15')
 # axs[2][0].set(ylabel='b = ' + '.175')
 
-plt.show()
-
+# plt.show()
