@@ -91,3 +91,8 @@ def plot_champ_tang_equ_diff(f, t0, tf, y0, yf, N):
     colormap = cm.viridis
     plt.quiver(X, Y, U, V, color=colormap(norm(colors)))
     plt.show()
+
+def h(x,y):
+    return x**2+y**2
+
+#plot_champ_tang_equ_diff(h, -3, 3, -5, 5, 100)
