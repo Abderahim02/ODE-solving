@@ -30,19 +30,35 @@ t = np.linspace(0, tmax, n)
 bmax = 10000
 
 # Variable
-B = np.linspace(.14, .16, bmax)
+B = np.linspace(.1, .2, bmax)
 
+"""
+Fonction qui détermine la période d'oscillation du système pour 
+une valeur de b donnée avec critère d'arrêt au bout d'une période"""
+# def determinePeriod(b):
+#     sol = odeint(system, y0, t, args=(b,))
+#     y = sol[:, 1]
+#     max_y = []
+#     for i in range(1, len(y) - 1):
+#         if t[i] > .2 and y[i] > y[i - 1] and y[i] > y[i + 1]: # y[i] is a local max
+#             if  len(max_y) > 0 and abs(y[i] - max_y[0]) < 1: # y[i] is close to the first local max
+#                 return len(max_y)
+#             max_y.append(int(y[i]))
+#     return len(max_y)
+
+"""
+Fonction simplifiée renvoyant la liste des maxima locaux de y 
+pour une valeur de b donnée sur l'ensemble de l'intervalle de temps"""
 def determinePeriod(b):
     sol = odeint(system, y0, t, args=(b,))
     y = sol[:, 1]
     max_y = []
     for i in range(1, len(y) - 1):
-        if t[i] > .2 and y[i] > y[i - 1] and y[i] > y[i + 1]: # y[i] is a local max
-            if  len(max_y) > 0 and abs(y[i] - max_y[0]) < 1: # y[i] is close to the first local max
-                return max_y
-            max_y.append(int(y[i]))
+        if t[i] > .2 and y[i] > y[i - 1] and y[i] > y[i + 1]:
+            max_y.append(y[i])
     return max_y
 
+# Plot des valeurs de y aux maxima locaux en fonction de b
 x, y = [], []
 for b in B:
     m = determinePeriod(b)
@@ -50,6 +66,8 @@ for b in B:
         x.append(b)
         y.append(m[i])
 plt.scatter(x, y, s=1)
+plt.xlabel('value of b')
+plt.ylabel('value of y at local maxima')
 plt.show()
 
 # fig, axs = plt.subplots(len(B), 3)

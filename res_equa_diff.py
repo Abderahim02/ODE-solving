@@ -117,6 +117,10 @@ def plot_champ_tang_equ_diff(f, t0, tf, y0, yf, N):
     plt.show()
 
 
+def h(x,y):
+    return x**2+y**2
+
+#plot_champ_tang_equ_diff(h, -3, 3, -5, 5, 100)
 ############### Rkutta4 N dimension ############## Abderahim
 
 def step_runge_kutta(y, t, h, f):
