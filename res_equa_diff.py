@@ -56,12 +56,12 @@ def norm(y, z):
                 L[i]=L[i]-L[j]
     return np.linalg.norm(L)
 
-##Cette fonction calcule une solution approché avec un paramètre d'erreur epsilon
+# ##Cette fonction calcule une solution approché avec un paramètre d'erreur epsilon
 def meth_epsilon(y0, t0, tf, eps, f, meth):
     N=1000
     h=(tf-t0)/N
-    y_N=meth_n_step(y0, t0, N, h, f, meth)[1]
-    y_2N=meth_n_step(y0, t0, 2*N, h/2, f, meth)[1]
+    y_N = meth_n_step(y0, t0, N, h, f, meth)[1]
+    y_2N = meth_n_step(y0, t0, 2*N, h/2, f, meth)[1]
     error = np.abs(norm(y_N, y_2N))
     while(error > eps):
             print(N)
@@ -72,6 +72,30 @@ def meth_epsilon(y0, t0, tf, eps, f, meth):
             error = np.abs(norm(y_N, y_2N))
     return y_N
 
+# ##Cette fonction calcule une solution approchée avec un paramètre d'erreur epsilon
+# def meth_epsilon_m(y0, t0, tf, eps, F, meth):
+#     N=1000
+#     h=(tf-t0)/N
+#     y_N = meth_n_step(y0, t0, N, h, F, meth)[1]
+#     y_2N = meth_n_step(y0, t0, 2*N, h/2, F, meth)[1]
+#     error = np.abs(norm(y_N, y_2N))
+#     while(error > eps):
+#             print(N)
+#             N=N*2
+#             h=(tf-t0)/N
+#             y_N=y_2N
+#             y_2N=meth_n_step(y0, t0, 2*N, h/2, F, meth)[1]
+#             error = np.abs(norm(y_N, y_2N))
+#     return y_N
+
+# ##Cette fonction calcule n étapes d'une méthode numérique sur une équation différentielle avec une fonction F
+# def meth_n_step_m(y0, t0, n, h, F, meth):
+#     y=y0
+#     t=t0
+#     for i in range(n):
+#         y=meth(y, t, h, F)
+#         t=t+h
+#     return t, y
 
 
 ##Cette fonction permet de dessiner le champ des tangentes de l'équation différentielle (on utilise quiver)
@@ -91,3 +115,26 @@ def plot_champ_tang_equ_diff(f, t0, tf, y0, yf, N):
     colormap = cm.viridis
     plt.quiver(X, Y, U, V, color=colormap(norm(colors)))
     plt.show()
+
+
+############### Rkutta4 N dimension ############## Abderahim
+
+def step_runge_kutta(y, t, h, f):
+    k1 = f(y, t)
+    k2 = f(y + (h/2)*k1, t + h/2)
+    k3 = f(y + (h/2)*k2, t + h/2)
+    k4 = f(y + h*k3, t + h)
+    return y + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+# Algorithme meth_n_step
+
+def meth_n_step(y0, t0, N, h, f, step_method):
+    y = np.zeros((N + 1, len(y0)))
+    t = np.zeros(N + 1)
+    y[0] = y0
+    t[0] = t0
+
+    for n in range(N):
+        phi = step_method(y[n], t[n], h, f)
+        y[n + 1] = phi
+        t[n + 1] = t[n] + h
+    return y, t
